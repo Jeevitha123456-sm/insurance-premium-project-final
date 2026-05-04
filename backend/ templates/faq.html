@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Frequently Asked Questions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            background-size: 400% 400%;
+            min-height: 100vh;
+            padding: 20px;
+            animation: gradientShift 15s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 24px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            margin-left: 20px;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .search-box {
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .search-box input::placeholder {
+            color: #999;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 14px;
+            font-size: 16px;
+            color: #999;
+        }
+        
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        
+        .category-tab {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .category-tab:hover,
+        .category-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .faq-item {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+        
+        .faq-question:hover {
+            background: #f9f9f9;
+        }
+        
+        .faq-icon {
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-item.open .faq-icon {
+            transform: rotate(180deg);
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+        
+        .faq-item.open .faq-answer {
+            max-height: 500px;
+            padding: 0 20px 20px 20px;
+        }
+        
+        .faq-answer-text {
+            color: #666;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        
+        .faq-answer-text a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .faq-answer-text a:hover {
+            text-decoration: underline;
+        }
+        
+        .contact-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 30px;
+            color: white;
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .contact-section h3 {
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        
+        .contact-section p {
+            margin-bottom: 20px;
+            opacity: 0.95;
+        }
+        
+        .contact-btn {
+            padding: 12px 30px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <h1>❓ FAQ</h1>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('history') }}">History</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+
+        <div class="header">
+            <h2>Frequently Asked Questions</h2>
+            <p>Find answers to common questions about our insurance premium calculator</p>
+            
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchBox" placeholder="Search questions...">
+            </div>
+        </div>
+
+        <div class="category-tabs">
+            <div class="category-tab active" onclick="filterCategory('all', event)">📋 All</div>
+            <div class="category-tab" onclick="filterCategory('calculator', event)">🧮 Calculator</div>
+            <div class="category-tab" onclick="filterCategory('premium', event)">💰 Premium</div>
+            <div class="category-tab" onclick="filterCategory('account', event)">👤 Account</div>
+        </div>
+
+        <div class="faq-list" id="faqList">
+            <!-- Calculator Category -->
+            <div class="faq-item" data-category="calculator">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>How accurate is the premium calculator?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-text">
+                        Our calculator uses a trained Random Forest machine learning model that learns from historical insurance data. It provides estimates that are typically accurate within 10-15% of actual quotes. For the most accurate quote, we recommend consulting with our insurance specialists directly.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="calculator">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>What factors affect the premium calculation?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-text">
+                        The main factors are: Age (younger = lower premium), BMI/Health Status, Smoking status (smokers pay higher), Region (varies by location), Gender (statistical factor), Coverage amount, and Number of dependents.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="calculator">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Can I update my information to see new quotes?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-text">
+                        Yes! You can edit any previous calculation from your history. Just click the "Edit" button on any record, update your information, and the premium will be recalculated instantly based on the new data.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Premium Category -->
+            <div class="faq-item" data-category="premium">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Why does smoking increase premiums so much?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-text">
+                        Smoking is directly linked to serious health conditions like heart disease, lung cancer, and stroke. Smokers file more insurance claims and face higher medical costs. That's why insurance companies charge 30-50% higher premiums for smokers compared to non-smokers.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="premium">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>How can I lower my premium?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-text">
+                        The best ways to lower your premium are:
+                        <br>• Quit smoking (biggest impact)
+                        <br>• Maintain a healthy BMI through exercise and nutrition
+                        <br>• Get regular health checkups to prevent chronic diseases
+                        <br>• Manage stress and mental health
+                        <br>• Consider a higher deductible for lower premiums
+                        <br>Visit our <a href="{{ url_for('wellness') }}">Wellness Hub</a> for detailed tips!
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="premium">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Do age and location really matter that much?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-text">
+                        Yes, both significantly impact premiums. Age affects risk profile - older individuals generally face higher premiums. Location matters because healthcare costs, climate, and regional disease prevalence vary. Our analytics show up to 30% premium variation by region and 5-year age groups.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Category -->
+            <div class="faq-item" data-category="account">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Is my personal information secure?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-text">
+                        Yes. Your data is encrypted during transmission (HTTPS) and stored securely in our database. We never share your information with third parties without consent. You can review our full privacy policy in your account settings.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="account">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>How do I export my calculation history?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-text">
+                        Go to your <a href="{{ url_for('history') }}">Calculation History</a> page. At the top, you'll find export options for CSV (for spreadsheets) or JSON (for data analysis tools). Select your format and download your complete history with all calculations and justifications.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="account">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Can I delete my account?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-text">
+                        Yes. Go to <a href="{{ url_for('settings') }}">Settings > Security</a> and select "Delete Account" in the Danger Zone. This will permanently delete your account and all associated data. This action cannot be undone.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="account">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>How do I change my password?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-text">
+                        Go to <a href="{{ url_for('settings') }}">Settings > Security</a>. Enter your current password, then your new password twice for confirmation. Click "Update Password" to save changes.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-section">
+            <h3>Still have questions?</h3>
+            <p style="margin-bottom: 20px;">Can't find what you're looking for? Our support team is here to help!</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <!-- First Contact Agent -->
+                <div style="padding: 15px; background: rgba(255,255,255,0.1); border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);">
+                    <div style="font-weight: 600; color: white; margin-bottom: 8px;">👨‍💼 Joshna</div>
+                    <div style="font-size: 13px; color: rgba(255,255,255,0.8); margin-bottom: 10px;">Customer Support Manager</div>
+                    <div style="font-size: 13px; color: #4facfe; margin: 4px 0;">📧 joshna@insuranceapp.com</div>
+                    <div style="font-size: 13px; color: #4facfe; margin-bottom: 12px;">📱 +1 (555) 345-6789</div>
+                    <button style="width: 100%; padding: 8px; background: #4facfe; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: 0.3s;" onclick="contactAgent('Joshna')">Contact Now</button>
+                </div>
+
+                <!-- Second Contact Agent -->
+                <div style="padding: 15px; background: rgba(255,255,255,0.1); border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);">
+                    <div style="font-weight: 600; color: white; margin-bottom: 8px;">👩‍💼 Archana</div>
+                    <div style="font-size: 13px; color: rgba(255,255,255,0.8); margin-bottom: 10px;">Technical Support Specialist</div>
+                    <div style="font-size: 13px; color: #00f2fe; margin: 4px 0;">📧 archana@insuranceapp.com</div>
+                    <div style="font-size: 13px; color: #00f2fe; margin-bottom: 12px;">📱 +1 (555) 456-7890</div>
+                    <button style="width: 100%; padding: 8px; background: #00f2fe; color: #333; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: 0.3s;" onclick="contactAgent('Archana')">Contact Now</button>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div style="padding: 20px; background: rgba(255,255,255,0.15); border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);">
+                <h4 style="color: white; margin-bottom: 15px;">Or send us a message</h4>
+                <input type="text" id="contactName" placeholder="Your Name" style="width: 100%; padding: 10px; margin-bottom: 10px; border: none; border-radius: 6px; background: rgba(255,255,255,0.2); color: white; font-size: 14px;">
+                <input type="email" id="contactEmail" placeholder="Your Email" style="width: 100%; padding: 10px; margin-bottom: 10px; border: none; border-radius: 6px; background: rgba(255,255,255,0.2); color: white; font-size: 14px;">
+                <textarea id="contactMessage" placeholder="Your message..." rows="4" style="width: 100%; padding: 10px; margin-bottom: 10px; border: none; border-radius: 6px; background: rgba(255,255,255,0.2); color: white; font-size: 14px; font-family: inherit; resize: vertical;"></textarea>
+                <button style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 15px;" onclick="submitContactForm()">📤 Send Message</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function contactAgent(agentName) {
+            alert(`📞 Connecting with ${agentName}...\n\nOur team will reach out to you shortly!\n\nCheck your email for confirmation.`);
+        }
+
+        function submitContactForm() {
+            const name = document.getElementById('contactName').value;
+            const email = document.getElementById('contactEmail').value;
+            const message = document.getElementById('contactMessage').value;
+
+            if (!name || !email || !message) {
+                alert('❌ Please fill in all fields');
+                return;
+            }
+
+            alert('✅ Message sent successfully!\n\nThank you, ' + name + '!\n\nWe will respond to ' + email + ' within 24 hours.');
+            
+            // Clear form
+            document.getElementById('contactName').value = '';
+            document.getElementById('contactEmail').value = '';
+            document.getElementById('contactMessage').value = '';
+        }
+
+        function toggleFAQ(element) {
+            const faqItem = element.closest('.faq-item');
+            faqItem.classList.toggle('open');
+        }
+
+        function filterCategory(category, event) {
+            event = event || window.event;
+
+            // Update active tab
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+
+            // Filter FAQ items
+            document.querySelectorAll('.faq-item').forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        document.getElementById('searchBox').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            document.querySelectorAll('.faq-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

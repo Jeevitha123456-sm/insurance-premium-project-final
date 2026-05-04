@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Profile & Preferences</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            background-size: 400% 400%;
+            min-height: 100vh;
+            padding: 20px;
+            animation: gradientShift 15s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 24px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            margin-left: 20px;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+        
+        .sidebar-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            margin-bottom: 8px;
+        }
+        
+        .sidebar-item:hover,
+        .sidebar-item.active {
+            background: #f0f0ff;
+            color: #667eea;
+            border-left-color: #667eea;
+        }
+        
+        .main-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .setting-group {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .setting-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .setting-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .setting-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .setting-description {
+            font-size: 13px;
+            color: #999;
+            margin-top: 6px;
+        }
+        
+        .toggle-setting {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .toggle {
+            width: 50px;
+            height: 28px;
+            background: #ddd;
+            border-radius: 14px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s;
+        }
+        
+        .toggle.active {
+            background: #667eea;
+        }
+        
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+        
+        .toggle.active::after {
+            left: 24px;
+        }
+        
+        .save-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .danger-zone {
+            padding: 20px;
+            background: #fff1f0;
+            border: 2px solid #ff6b6b;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .danger-title {
+            color: #c33;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .danger-btn {
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .danger-btn:hover {
+            background: #ff5252;
+        }
+        
+        @media (max-width: 768px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <h1>⚙️ Settings</h1>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('history') }}">History</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+
+        <div class="settings-grid">
+            <div class="sidebar">
+                <div class="sidebar-item active" onclick="showSection('profile')">👤 Profile</div>
+                <div class="sidebar-item" onclick="showSection('notifications')">🔔 Notifications</div>
+                
+            </div>
+
+            <div class="main-content">
+                <!-- Profile Section -->
+                <div id="profile" class="content-section active">
+                    <div class="section-title">👤 Profile Settings</div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">Full Name</label>
+                        <input type="text" class="setting-input" id="fullName" value="{{ user_profile.get('name', '') or user_name }}" placeholder="Your full name">
+                        <div class="setting-description">Your account name registered with us</div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">Email Address</label>
+                        <input type="email" class="setting-input" id="email" value="{{ user_profile.get('email', '') }}" placeholder="your.email@example.com">
+                        <div class="setting-description">We'll never share your email with anyone else</div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">Phone Number</label>
+                        <input type="tel" class="setting-input" id="phone" value="{{ user_profile.get('phone', '') }}" placeholder="+1 (555) 000-0000">
+                        <div class="setting-description">Optional contact number for insurance communications</div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">Date of Birth</label>
+                        <input type="date" class="setting-input" id="dob" value="{{ user_profile.get('dob', '') }}">
+                        <div class="setting-description">Used for age verification and personalized recommendations</div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">Address</label>
+                        <input type="text" class="setting-input" id="address" value="{{ user_profile.get('address', '') }}" placeholder="123 Main Street">
+                        <div class="setting-description">Your residential address</div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">City</label>
+                        <input type="text" class="setting-input" id="city" value="{{ user_profile.get('city', '') }}" placeholder="New York">
+                        <div class="setting-description">City of residence</div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">State/Province</label>
+                        <input type="text" class="setting-input" id="state" value="{{ user_profile.get('state', '') }}" placeholder="NY">
+                        <div class="setting-description">State or province code</div>
+                    </div>
+                    
+                    <button class="save-btn" onclick="saveProfile()">💾 Save Profile Changes</button>
+                    <div id="profileMessage" style="margin-top: 10px; font-size: 14px;"></div>
+                </div>
+
+                <!-- Notifications Section -->
+                <div id="notifications" class="content-section">
+                    <div class="section-title">🔔 Notifications</div>
+                    
+                    <div class="setting-group">
+                        <div class="toggle-item">
+                            <div>
+                                <div class="toggle-title">Email Notifications</div>
+                                <div class="toggle-description">Receive updates via email</div>
+                            </div>
+                            <input type="checkbox" id="emailNotif" class="toggle-switch">
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <div class="toggle-item">
+                            <div>
+                                <div class="toggle-title">Renewal Reminders</div>
+                                <div class="toggle-description">Get alerts before policy expires</div>
+                            </div>
+                            <input type="checkbox" id="renewalReminders" class="toggle-switch" checked>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <div class="toggle-item">
+                            <div>
+                                <div class="toggle-title">Price Change Alerts</div>
+                                <div class="toggle-description">Notify when premium rates change</div>
+                            </div>
+                            <input type="checkbox" id="priceAlerts" class="toggle-switch" checked>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <div class="toggle-item">
+                            <div>
+                                <div class="toggle-title">Marketing Communications</div>
+                                <div class="toggle-description">Receive offers and promotions</div>
+                            </div>
+                            <input type="checkbox" id="marketingComms" class="toggle-switch">
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <div class="toggle-item">
+                            <div>
+                                <div class="toggle-title">SMS Notifications</div>
+                                <div class="toggle-description">Get important updates via SMS</div>
+                            </div>
+                            <input type="checkbox" id="smsNotif" class="toggle-switch">
+                        </div>
+                    </div>
+                    
+                    <button class="save-btn" onclick="saveNotifications()">💾 Save Notification Settings</button>
+                    <div id="notificationsMessage" style="margin-top: 10px; font-size: 14px;"></div>
+                </div>
+
+                <!-- Security Section -->
+                <div id="security" class="content-section">
+                    <div class="section-title">🔒 Security Settings</div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">Current Password</label>
+                        <input type="password" class="setting-input" id="currentPassword" placeholder="••••••••">
+                        <div class="setting-description">Enter your current password to verify</div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">New Password</label>
+                        <input type="password" class="setting-input" id="newPassword" placeholder="••••••••">
+                        <div class="setting-description">At least 8 characters with uppercase, lowercase, and numbers</div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">Confirm New Password</label>
+                        <input type="password" class="setting-input" id="confirmPassword" placeholder="••••••••">
+                        <div class="setting-description">Retype your new password to confirm</div>
+                    </div>
+                    
+                    <button class="save-btn" onclick="updatePassword()">🔐 Update Password</button>
+                    <div id="securityMessage" style="margin-top: 10px; font-size: 14px;"></div>
+                    
+                    <div class="danger-zone">
+                        <div class="danger-title">⚠️ Danger Zone</div>
+                        <p style="font-size: 13px; color: #c33; margin-bottom: 10px;">Deleting your account is permanent and cannot be undone.</p>
+                        <button class="danger-btn" onclick="deleteAccount()">🗑️ Delete Account</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            
+            // Remove active from sidebar items
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active to clicked sidebar item
+            event.target.classList.add('active');
+        }
+        
+        // Save Profile Function
+        function saveProfile() {
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const dob = document.getElementById('dob').value;
+            const address = document.getElementById('address').value;
+            const city = document.getElementById('city').value;
+            const state = document.getElementById('state').value;
+            
+            if (!fullName || !email) {
+                document.getElementById('profileMessage').innerHTML = '<span style="color: #ff6b6b;">❌ Name and Email are required!</span>';
+                return;
+            }
+            
+            fetch('/api/update-profile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fullName: fullName,
+                    email: email,
+                    phone: phone,
+                    dob: dob,
+                    address: address,
+                    city: city,
+                    state: state
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('profileMessage').innerHTML = '<span style="color: #51cf66;">💡 ✅ Profile updated successfully! Redirecting to dashboard...</span>';
+                    // Mark profile as updated and redirect after 2 seconds
+                    localStorage.setItem('profileUpdated', 'true');
+                    setTimeout(() => {
+                        window.location.href = '{{ url_for("dashboard") }}';
+                    }, 2000);
+                } else {
+                    document.getElementById('profileMessage').innerHTML = '<span style="color: #ff6b6b;">❌ ' + data.message + '</span>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('profileMessage').innerHTML = '<span style="color: #ff6b6b;">❌ Error updating profile</span>';
+                console.error('Error:', error);
+            });
+        }
+        
+        // Save Notifications Function
+        function saveNotifications() {
+            const emailNotif = document.getElementById('emailNotif').checked;
+            const renewalReminders = document.getElementById('renewalReminders').checked;
+            const priceAlerts = document.getElementById('priceAlerts').checked;
+            const marketingComms = document.getElementById('marketingComms').checked;
+            const smsNotif = document.getElementById('smsNotif').checked;
+            
+            fetch('/api/update-notifications', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    emailNotif: emailNotif,
+                    renewalReminders: renewalReminders,
+                    priceAlerts: priceAlerts,
+                    marketingComms: marketingComms,
+                    smsNotif: smsNotif
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('notificationsMessage').innerHTML = '<span style="color: #51cf66;">✅ Notification settings updated!</span>';
+                } else {
+                    document.getElementById('notificationsMessage').innerHTML = '<span style="color: #ff6b6b;">❌ ' + data.message + '</span>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('notificationsMessage').innerHTML = '<span style="color: #ff6b6b;">❌ Error updating notifications</span>';
+                console.error('Error:', error);
+            });
+        }
+        
+        // Update Password Function
+        function updatePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                document.getElementById('securityMessage').innerHTML = '<span style="color: #ff6b6b;">❌ All password fields are required!</span>';
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                document.getElementById('securityMessage').innerHTML = '<span style="color: #ff6b6b;">❌ New passwords do not match!</span>';
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                document.getElementById('securityMessage').innerHTML = '<span style="color: #ff6b6b;">❌ Password must be at least 8 characters!</span>';
+                return;
+            }
+            
+            fetch('/api/update-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    currentPassword: currentPassword,
+                    newPassword: newPassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('securityMessage').innerHTML = '<span style="color: #51cf66;">✅ Password updated successfully!</span>';
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                } else {
+                    document.getElementById('securityMessage').innerHTML = '<span style="color: #ff6b6b;">❌ ' + data.message + '</span>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('securityMessage').innerHTML = '<span style="color: #ff6b6b;">❌ Error updating password</span>';
+                console.error('Error:', error);
+            });
+        }
+        
+        // Delete Account Function
+        function deleteAccount() {
+            if (confirm('⚠️ Are you sure? This action cannot be undone! Type DELETE to confirm.')) {
+                const confirmation = prompt('Type "DELETE" to confirm account deletion:');
+                if (confirmation === 'DELETE') {
+                    fetch('/api/delete-account', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Account deleted. Redirecting...');
+                            window.location.href = '{{ url_for("login") }}';
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error deleting account');
+                        console.error('Error:', error);
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>

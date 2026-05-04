@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Calculation - Insurance Premium Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            background-size: 400% 400%;
+            min-height: 100vh;
+            padding: 20px;
+            animation: gradientShift 15s ease infinite;
+            position: relative;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        p {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e7ff;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
+            color: #333;
+        }
+        
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.08) 100%);
+            border-radius: 10px;
+            border: 2px solid #e0e7ff;
+            cursor: pointer;
+        }
+        
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        
+        button,
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .cancel-btn {
+            background: linear-gradient(135deg, #e0e0e0 0%, #d0d0d0 100%);
+            color: #666;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cancel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .original-value {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✏️ Edit Calculation</h1>
+        <p>Update the insurance details to recalculate the premium</p>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="name">👤 Full Name</label>
+                <input type="text" id="name" name="name" value="{{ record['name'] }}" required>
+                <div class="original-value">Original: {{ record['name'] }}</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="age">🎂 Age</label>
+                <input type="number" id="age" name="age" min="18" max="100" value="{{ record['age'] }}" required>
+                <div class="original-value">Original: {{ record['age'] }} years</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="sex">⚧️ Gender</label>
+                <select id="sex" name="sex" required>
+                    <option value="male" {% if record['sex'] == 'male' %}selected{% endif %}>Male</option>
+                    <option value="female" {% if record['sex'] == 'female' %}selected{% endif %}>Female</option>
+                </select>
+                <div class="original-value">Original: {{ record['sex'] }}</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="bmi">💪 Body Mass Index (BMI)</label>
+                <input type="number" id="bmi" name="bmi" min="10" max="50" step="0.1" value="{{ record['bmi'] }}" required>
+                <div class="original-value">Original: {{ record['bmi'] }}</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="region">🌍 Region</label>
+                <select id="region" name="region" required>
+                    <option value="northwest" {% if record['region'] == 'northwest' %}selected{% endif %}>Northwest</option>
+                    <option value="northeast" {% if record['region'] == 'northeast' %}selected{% endif %}>Northeast</option>
+                    <option value="southeast" {% if record['region'] == 'southeast' %}selected{% endif %}>Southeast</option>
+                    <option value="southwest" {% if record['region'] == 'southwest' %}selected{% endif %}>Southwest</option>
+                </select>
+                <div class="original-value">Original: {{ record['region'] }}</div>
+            </div>
+            
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="smoker" name="smoker" {% if record['smoker'] %}checked{% endif %}>
+                <label for="smoker" style="margin-bottom: 0; cursor: pointer;">🚬 Are you a smoker?</label>
+            </div>
+            
+            <div class="form-group">
+                <label for="sum_insured">💳 Coverage Amount ($)</label>
+                <input type="number" id="sum_insured" name="sum_insured" min="10000" value="{{ record['sum_insured'] }}" required>
+                <div class="original-value">Original: ${{ record['sum_insured'] }}</div>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="submit-btn">✅ Save Changes</button>
+                <a href="{{ url_for('history') }}" class="cancel-btn">❌ Cancel</a>
+            </div>
+        </form>
+        
+        <p style="margin-top: 25px; font-size: 13px; text-align: center; color: #999;">
+            💡 Current Premium: <strong style="color: #667eea;">${{ "%.2f"|format(record['premium']) }}</strong>
+        </p>
+    </div>
+</body>
+</html>

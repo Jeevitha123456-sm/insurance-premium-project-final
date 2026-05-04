@@ -1,0 +1,20 @@
+﻿        <div class="navbar-right">
+            <a href="{{ url_for('index') }}">🏠 Home</a>
+            <span>👤 Welcome, <strong>{{ user_name or 'User' }}</strong></span>
+            <a href="{{ url_for('quick_quote') }}">⚡ Quick Quote</a>
+            <a href="{{ url_for('charts') }}">📈 View Charts</a>
+            <a href="{{ url_for('wellness') }}">💚 Wellness</a>
+            <a href="{{ url_for('history') }}">📊 Calculation History</a>
+            <a href="{{ url_for('similarity') }}">🔍 Similar Profiles</a>
+            <a href="{{ url_for('faq') }}">❓ FAQ</a>
+            <a href="{{ url_for('settings') }}" class="profile-btn" title="View Profile">
+                <span style="font-size: 14px;">👤</span>
+                {% if user_profile and user_profile.name %}
+                    {{ user_profile.name.split()[0] }}
+                {% else %}
+                    Profile
+                {% endif %}
+                <span id="profileUpdateIndicator" style="display: none; margin-left: 5px; font-size: 16px;">💡</span>
+            </a>
+            <a href="{{ url_for('logout') }}" class="logout">🚪 Logout</a>
+        </div>

@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics & Charts - Insurance Premium Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            background-size: 400% 400%;
+            min-height: 100vh;
+            padding: 20px;
+            animation: gradientShift 15s ease infinite;
+            position: relative;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
+            animation: float 8s ease-in-out infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -50px;
+            left: -50px;
+            animation: float 10s ease-in-out infinite reverse;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(20px); }
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            border-radius: 18px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 10;
+            animation: slideDown 0.6s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .navbar h2 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .navbar-right {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+        
+        .navbar-right span {
+            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .navbar-right span strong {
+            background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .navbar-right a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            padding: 10px 18px;
+            border-radius: 10px;
+            position: relative;
+            font-size: 14px;
+        }
+        
+        .navbar-right a:hover {
+            color: #764ba2;
+            background: rgba(118, 75, 162, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .navbar-right a.logout {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            color: white !important;
+            padding: 12px 22px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            font-weight: 700;
+            border: none;
+        }
+        
+        .navbar-right a.logout:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 800;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .charts-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .data-entries-card {
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .data-entries-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(240, 147, 251, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+            z-index: 0;
+        }
+        
+        .card-header {
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            color: white;
+            font-size: 20px;
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .entries-list {
+            overflow-y: auto;
+            padding: 0;
+            flex: 1;
+            max-height: 600px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .entry-item {
+            padding: 18px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #f9f9f9;
+        }
+        
+        .entry-item:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.08) 100%);
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+        
+        .entry-item:last-child {
+            border-bottom: none;
+        }
+        
+        .entry-name {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        
+        .entry-details {
+            font-size: 12px;
+            color: #999;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .entry-detail {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .entry-detail-label {
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .entry-premium {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+        
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .charts-section > :first-child {
+            grid-column: 1 / -1;
+        }
+        
+        .chart-card {
+            background: rgba(255, 255, 255, 0.96);
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(240, 147, 251, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+            z-index: 0;
+        }
+        
+        .chart-title {
+            color: #333;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 350px;
+            z-index: 1;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: #666;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .empty-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 1024px) {
+            .charts-wrapper {
+                grid-template-columns: 1fr;
+            }
+            
+            .entries-list {
+                max-height: 300px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .navbar-right {
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h2>💼 Insurance Premium Calculator</h2>
+        <div class="navbar-right">
+            <span>👤 Welcome, <strong>{{ user_name or 'User' }}</strong></span>
+            <a href="{{ url_for('dashboard') }}">📊 Dashboard</a>
+            <a href="{{ url_for('history') }}">📋 History</a>
+            <a href="{{ url_for('logout') }}" class="logout">🚪 Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1>📈 Analytics & Charts Dashboard</h1>
+        
+        {% if error %}
+        <div style="background: linear-gradient(135deg, #fff1f0 0%, #ffe8e6 100%); color: #c33; padding: 16px 20px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid #ff6b6b;">
+            ⚠️ {{ error }}
+        </div>
+        {% endif %}
+        
+        <div class="charts-wrapper">
+            <!-- Left Side: Data Entries -->
+            <div class="data-entries-card">
+                <div class="card-header">📊 Data Entries ({{ history|length }})</div>
+                <div class="entries-list">
+                    {% if history %}
+                        {% for record in history %}
+                        <div class="entry-item">
+                            <div class="entry-name">{{ record['name'] }}</div>
+                            <div class="entry-details">
+                                <div class="entry-detail">
+                                    <span class="entry-detail-label">Age:</span>
+                                    <span>{{ record['age'] }}</span>
+                                </div>
+                                <div class="entry-detail">
+                                    <span class="entry-detail-label">BMI:</span>
+                                    <span>{{ record['bmi'] }}</span>
+                                </div>
+                                <div class="entry-detail">
+                                    <span class="entry-detail-label">Region:</span>
+                                    <span>{{ record['region'] }}</span>
+                                </div>
+                                <div class="entry-detail">
+                                    <span class="entry-detail-label">Smoker:</span>
+                                    <span>{% if record['smoker'] %}Yes{% else %}No{% endif %}</span>
+                                </div>
+                            </div>
+                            <div class="entry-premium">💰 ${{ record['premium']|round(2) }}</div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <p>No calculation data yet. Start calculating premium to see data here.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Right Side: Charts -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-title">📈 Premium Trend</div>
+                    <div class="chart-container">
+                        <canvas id="premiumTrendChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-title">💰 Premium Distribution</div>
+                    <div class="chart-container">
+                        <canvas id="premiumDistributionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">🌍 Premium by Region</div>
+                    <div class="chart-container">
+                        <canvas id="regionComparisonChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">🚬 Smoker vs Non-Smoker</div>
+                    <div class="chart-container">
+                        <canvas id="smokerComparisonChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">👥 Average Premium by Age Group</div>
+                    <div class="chart-container">
+                        <canvas id="ageGroupChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%); color: white; padding: 20px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 28px; font-weight: bold;">🚬 {{ smoker_count }}</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Smokers</div>
+                        <div style="font-size: 16px; margin-top: 8px; font-weight: 600;">${{ "%.0f"|format(smoker_avg) }}</div>
+                        <div style="font-size: 12px; opacity: 0.9;">Avg Premium</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 20px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 28px; font-weight: bold;">✅ {{ non_smoker_count }}</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Non-Smokers</div>
+                        <div style="font-size: 16px; margin-top: 8px; font-weight: 600;">${{ "%.0f"|format(non_smoker_avg) }}</div>
+                        <div style="font-size: 12px; opacity: 0.9;">Avg Premium</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 28px; font-weight: bold;">📊 {% if smoker_count > 0 %}{{ "%.0f"|format((smoker_avg / non_smoker_avg - 1) * 100) }}%{% else %}0%{% endif %}</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Smoker Premium Increase</div>
+                        <div style="font-size: 12px; margin-top: 12px; opacity: 0.85;">Compared to non-smokers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Data from backend
+        const premiums = {{ premiums|tojson }};
+        const dates = {{ dates|tojson }};
+        const labels = {{ labels|tojson }};
+        const totalCalculations = {{ total_calculations }};
+        const avgPremium = {{ avg_premium }};
+        const regionNames = {{ region_names|tojson }};
+        const regionPremiums = {{ region_premiums|tojson }};
+        const smokerCount = {{ smoker_count }};
+        const nonSmokerCount = {{ non_smoker_count }};
+        const smokerAvg = {{ smoker_avg }};
+        const nonSmokerAvg = {{ non_smoker_avg }};
+        const ageGroupNames = {{ age_group_names|tojson }};
+        const ageGroupPremiums = {{ age_group_premiums|tojson }};
+        
+        // Reverse data for chronological order
+        premiums.reverse();
+        dates.reverse();
+        labels.reverse();
+        
+        // Premium Trend Chart
+        const premiumTrendCtx = document.getElementById('premiumTrendChart');
+        if (premiumTrendCtx && premiums.length > 0) {
+            new Chart(premiumTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Premium Amount ($)',
+                        data: premiums,
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#666',
+                                font: { size: 13, weight: 'bold' },
+                                padding: 15
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: { color: '#999', font: { size: 12 } },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        x: {
+                            ticks: { color: '#999', font: { size: 12 } },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Premium Distribution Chart
+        const premiumDistributionCtx = document.getElementById('premiumDistributionChart');
+        if (premiumDistributionCtx && premiums.length > 0) {
+            const minPremium = Math.min(...premiums);
+            const maxPremium = Math.max(...premiums);
+            
+            new Chart(premiumDistributionCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Premium Amount ($)',
+                        data: premiums,
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(118, 75, 162, 0.8)',
+                            'rgba(240, 147, 251, 0.8)',
+                            'rgba(79, 172, 254, 0.8)',
+                            'rgba(0, 242, 254, 0.8)',
+                        ],
+                        borderColor: [
+                            'rgba(102, 126, 234, 1)',
+                            'rgba(118, 75, 162, 1)',
+                            'rgba(240, 147, 251, 1)',
+                            'rgba(79, 172, 254, 1)',
+                            'rgba(0, 242, 254, 1)',
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    indexAxis: 'x',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#666',
+                                font: { size: 13, weight: 'bold' },
+                                padding: 15
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#999', font: { size: 12 } },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        x: {
+                            ticks: { color: '#999', font: { size: 12 } },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Region Comparison Chart
+        const regionComparisonCtx = document.getElementById('regionComparisonChart');
+        if (regionComparisonCtx && regionNames && regionNames.length > 0) {
+            new Chart(regionComparisonCtx, {
+                type: 'bar',
+                data: {
+                    labels: regionNames.map(r => r.charAt(0).toUpperCase() + r.slice(1)),
+                    datasets: [{
+                        label: 'Average Premium by Region ($)',
+                        data: regionPremiums,
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(118, 75, 162, 0.8)',
+                            'rgba(240, 147, 251, 0.8)',
+                            'rgba(79, 172, 254, 0.8)',
+                        ],
+                        borderColor: [
+                            'rgba(102, 126, 234, 1)',
+                            'rgba(118, 75, 162, 1)',
+                            'rgba(240, 147, 251, 1)',
+                            'rgba(79, 172, 254, 1)',
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    indexAxis: 'x',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#666',
+                                font: { size: 13, weight: 'bold' },
+                                padding: 15
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#999', font: { size: 12 } },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        x: {
+                            ticks: { color: '#999', font: { size: 12 } },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Smoker vs Non-Smoker Comparison Chart
+        const smokerComparisonCtx = document.getElementById('smokerComparisonChart');
+        if (smokerComparisonCtx) {
+            new Chart(smokerComparisonCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['🚬 Smokers', '✅ Non-Smokers'],
+                    datasets: [{
+                        data: [smokerCount, nonSmokerCount],
+                        backgroundColor: [
+                            'rgba(255, 107, 107, 0.8)',
+                            'rgba(79, 172, 254, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 107, 107, 1)',
+                            'rgba(79, 172, 254, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#666',
+                                font: { size: 13, weight: 'bold' },
+                                padding: 15
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Age Group Analytics Chart
+        const ageGroupCtx = document.getElementById('ageGroupChart');
+        if (ageGroupCtx && ageGroupNames && ageGroupNames.length > 0) {
+            new Chart(ageGroupCtx, {
+                type: 'bar',
+                data: {
+                    labels: ageGroupNames,
+                    datasets: [{
+                        label: 'Average Premium ($)',
+                        data: ageGroupPremiums,
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(118, 75, 162, 0.8)',
+                            'rgba(240, 147, 251, 0.8)',
+                            'rgba(79, 172, 254, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(102, 126, 234, 1)',
+                            'rgba(118, 75, 162, 1)',
+                            'rgba(240, 147, 251, 1)',
+                            'rgba(79, 172, 254, 1)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#666',
+                                font: { size: 13, weight: 'bold' },
+                                padding: 15
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#999', font: { size: 12 } },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        x: {
+                            ticks: { color: '#999', font: { size: 12 } },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
